@@ -91,6 +91,11 @@ void inline particle_mass(single<double>::accessor<wo> particle_mass_a,
   (*particle_mass_a) = mean_molecular_weight * constants::cgs::proton_mass;
 } // kappa
 
+template<std::size_t D>
+inline void gravity(single<vec<D>>::accessor<wo> gravity_a, vec<D> g) {
+  (*gravity_a) = g;
+} // gravity
+
 /*----------------------------------------------------------------------------*
   Fake initialization tasks to avoid legion errors.
  *----------------------------------------------------------------------------*/

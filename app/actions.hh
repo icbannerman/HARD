@@ -10,6 +10,7 @@
 #include "tasks/hydro/cons2prim.hh"
 #include "tasks/hydro/maxcharspeed.hh"
 #include "tasks/hydro/reconstruct.hh"
+#include "tasks/hydro/gravity_source.hh"
 #include "tasks/init.hh"
 #include "tasks/rad.hh"
 #include "tasks/rad_root.hh"
@@ -112,6 +113,13 @@ RK_advance(control_policy<state, D> & cp, time_stepper::rk_stage Stage) {
       s.dt_momentum_density(s.m),
       s.dt_total_energy_density(s.m),
       s.dt_radiation_energy_density(s.m));
+    flecsi::execute<tasks::hydro::apply_gravity<D>, flecsi::default_accelerator>(
+      s.m,
+      s.mass_density(s.m),
+      s.velocity(s.m),
+      s.dt_momentum_density(s.m),
+      s.dt_total_energy_density(s.m),
+      gravity(s.gt));
   }
   else if(Stage == time_stepper::rk_stage::Second) {
     flecsi::execute<task::rad::explicitSourceUpdate<D>,
@@ -124,6 +132,13 @@ RK_advance(control_policy<state, D> & cp, time_stepper::rk_stage Stage) {
       s.dt_momentum_density_2(s.m),
       s.dt_total_energy_density_2(s.m),
       s.dt_radiation_energy_density_2(s.m));
+    flecsi::execute<tasks::hydro::apply_gravity<D>, flecsi::default_accelerator>(
+      s.m,
+      s.mass_density(s.m),
+      s.velocity(s.m),
+      s.dt_momentum_density_2(s.m),
+      s.dt_total_energy_density_2(s.m),
+      gravity(s.gt));
   }
 #endif
 

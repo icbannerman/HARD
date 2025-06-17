@@ -116,6 +116,19 @@ initialize(control_policy<state, D> & cp) {
     particle_mass(s.gt), config["mean_molecular_weight"].as<double>());
 
   /*--------------------------------------------------------------------------*
+    Gravity vector
+   *--------------------------------------------------------------------------*/
+  vec<D> gvec{0.0};
+  if(config["problem_parameters"]["gravity"]) {
+    gvec.x = config["problem_parameters"]["gravity"][0].as<double>();
+    if constexpr(D >= 2)
+      gvec.y = config["problem_parameters"]["gravity"][1].as<double>();
+    if constexpr(D == 3)
+      gvec.z = config["problem_parameters"]["gravity"][2].as<double>();
+  }
+  execute<tasks::init::gravity<D>>(gravity(s.gt), gvec);
+
+  /*--------------------------------------------------------------------------*
     Mesh topology allocation.
    *--------------------------------------------------------------------------*/
 
@@ -318,6 +331,19 @@ initialize(control_policy<state, D> & cp) {
 #endif
 
     execute<tasks::initial_data::kh_instability<D>>(s.m,
+      s.mass_density(s.m),
+      s.momentum_density(s.m),
+      s.total_energy_density(s.m),
+      s.radiation_energy_density(s.m),
+      s.eos);
+  }
+  else if(config["problem"].as<std::string>() == "rayleigh-taylor") {
+
+#ifdef ENABLE_RADIATION
+    flog_fatal("Rayleigh-Taylor must be built with ENABLE_RADIATION=OFF");
+#endif
+
+    execute<tasks::initial_data::rayleigh_taylor<D>>(s.m,
       s.mass_density(s.m),
       s.momentum_density(s.m),
       s.total_energy_density(s.m),

@@ -66,6 +66,7 @@ struct state {
 
   static inline const single<double>::template definition<global> dt, t,
     dt_weighted;
+  static inline const single<vec<D>>::template definition<global> gravity;
 
   /*--------------------------------------------------------------------------*
     Mesh fields.
